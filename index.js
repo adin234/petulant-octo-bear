@@ -509,6 +509,36 @@ exports.translate_job = function(videos) {
     return start();
 }
 
-exports.cache_videos({}, {}, function (err, result) {
-    console.log(err);
-});
+exports.manage_db = function() {
+    var data = {},
+        start = function() {
+            mongo.dropDatabase('asiafreedom_youtubers', function(err, result) {
+                if(err) {
+                    return console.log('error in dropping');
+                }
+
+                mongob.admin().command({
+                    copydb: 1,
+                    fromdb: 'asiafreedom_youtubers_backup',
+                    todb: 'asiafreedom_youtubers'
+                }, function(err, result) {
+                    if(err) {
+                        return console.log('err');
+                    }
+
+                    mongo.collection('videos').ensureIndex({engtitle: "text"}, function(err, result) {
+                        console.log('success');
+                        process.kill();
+                    });
+                });
+            })
+        };
+
+    start();
+};
+
+// exports.cache_videos({}, {}, function (err, result) {
+//     console.log(err);
+// });
+
+exports.manage_db();
