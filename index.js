@@ -421,7 +421,8 @@ exports.merge_tags = function (videos) {
                                     if(counter === videos.length) {
                                         console.log('finished merging tags');
                                         console.log('translated all '+process.start_time+ ' - '+(new Date()));
-                                        process.kill();
+                                        
+                                        exports.manage_db();
                                     }
                                 }
                             );
@@ -537,8 +538,6 @@ exports.manage_db = function() {
     start();
 };
 
-// exports.cache_videos({}, {}, function (err, result) {
-//     console.log(err);
-// });
-
-exports.manage_db();
+exports.cache_videos({}, {}, function (err, result) {
+    console.log(err);
+});
