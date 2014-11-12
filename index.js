@@ -413,8 +413,8 @@ exports.merge_tags = function (videos) {
         mb,
         videos = videos,
         start = function() {
+            console.log('videos '+videos.length);
             videos.forEach(function(item) {
-                (function(item) {
                     console.log('loop at '+(++counter3));
 
                     var anytv_tags = item.snippet.meta.tags.filter(function(e) {
@@ -422,7 +422,7 @@ exports.merge_tags = function (videos) {
                     });
 
                     if(anytv_tags.length) {
-                        mb
+                        mongob.collection('videos')
                             .update({
                                     'snippet.resourceId.videoId' : item.snippet.resourceId.videoId
                                 }, {
@@ -451,13 +451,11 @@ exports.merge_tags = function (videos) {
                             +(counter2+counter1)+'/'+videos.length
                             +' '+counter1+'|'+counter2);
                     }
-                })(item);
             })
         };
 
-    mb = mongob.collection('videos');
-
     if(!videos) {
+        console.log('get_videos');
         return mongo.collection('videos')
             .find()
             .toArray(function(err, result) {
