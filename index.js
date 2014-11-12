@@ -407,7 +407,8 @@ exports.cache_videos = function(req, res, next) {
 
 exports.merge_tags = function (videos) {
     var data = {},
-        counter = 0,
+        counter1 = 0,
+        counter2 = 0,
         mb,
         videos = videos,
         start = function() {
@@ -424,14 +425,14 @@ exports.merge_tags = function (videos) {
                                 }, {
                                     '$push' : { 'snippet.meta.tags' : { '$each' : anytv_tags } }
                                 }, function(err, result) {
-                                    counter++;
+                                    counter1++;
                                     if(err) {
                                         return console.log(err);
                                     }
 
-                                    console.log(item.snippet.resourceId.videoId+' merge here '+counter+'/'+videos.length);
+                                    console.log(item.snippet.resourceId.videoId+' merge here '+counter1+'/'+videos.length);
 
-                                    if(counter === videos.length) {
+                                    if((counter1+counter2) === videos.length) {
                                         console.log('finished merging tags');
                                         console.log('translated all '+process.start_time+ ' - '+(new Date()));
                                         
@@ -440,8 +441,8 @@ exports.merge_tags = function (videos) {
                                 }
                             );
                     } else {
-                        counter++;
-                        console.log(item.snippet.resourceId.videoId+' merge no tags '+counter+'/'+videos.length);
+                        counter2++;
+                        console.log(item.snippet.resourceId.videoId+' merge no tags '+counter2+'/'+videos.length);
                     }
                 })(item);
             })
