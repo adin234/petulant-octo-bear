@@ -430,7 +430,9 @@ exports.merge_tags = function (videos) {
                                         return console.log(err);
                                     }
 
-                                    console.log(item.snippet.resourceId.videoId+' merge here '+counter1+'/'+videos.length);
+                                    console.log(item.snippet.resourceId.videoId+' merge with tags '
+                                        +(counter2+counter1)+'/'+videos.length
+                                        +' '+counter1+'|'+counter2);
 
                                     if((counter1+counter2) === videos.length) {
                                         console.log('finished merging tags');
@@ -442,7 +444,9 @@ exports.merge_tags = function (videos) {
                             );
                     } else {
                         counter2++;
-                        console.log(item.snippet.resourceId.videoId+' merge no tags '+counter2+'/'+videos.length);
+                        console.log(item.snippet.resourceId.videoId+' merge no tags '
+                            +(counter2+counter1)+'/'+videos.length
+                            +' '+counter1+'|'+counter2);
                     }
                 })(item);
             })
