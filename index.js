@@ -441,6 +441,7 @@ exports.merge_tags = function (videos) {
                             );
                     } else {
                         counter++;
+                        console.log(item.snippet.resourceId.videoId+' merge here '+counter+'/'+videos.length);
                     }
                 })(item);
             })
