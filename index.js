@@ -409,7 +409,7 @@ exports.merge_tags = function (videos) {
     var data = {},
         counter1 = 0,
         counter2 = 0,
-        counter3 = 0;
+        counter3 = 0,
         mb,
         videos = videos,
         start = function() {
