@@ -389,7 +389,20 @@ exports.cache_videos = function(req, res, next) {
         };
 
     process.start_time = new Date();
-    start();
+
+    mongo.admin().command({
+        copydb: 1,
+        fromdb: 'asiafreedom_youtubers',
+        todb: 'asiafreedom_youtubers_backup'
+    }, function(err, result) {
+        if(err) {
+            return console.log('err');
+        }
+
+        mongob.dropCollection('videos', function(err, result) {
+            start();
+        });
+    });
 };
 
 exports.merge_tags = function (videos) {
@@ -513,7 +526,7 @@ exports.translate_job = function(videos) {
 exports.manage_db = function() {
     var data = {},
         start = function() {
-            mongo.dropDatabase('asiafreedom_youtubers', function(err, result) {
+            mongo.dropCollection('videos', function(err, result) {
                 if(err) {
                     return console.log('error in dropping');
                 }
