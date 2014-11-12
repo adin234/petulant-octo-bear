@@ -409,11 +409,14 @@ exports.merge_tags = function (videos) {
     var data = {},
         counter1 = 0,
         counter2 = 0,
+        counter3 = 0;
         mb,
         videos = videos,
         start = function() {
             videos.forEach(function(item) {
                 (function(item) {
+                    console.log('loop at '+(++counter3));
+                    
                     var anytv_tags = item.snippet.meta.tags.filter(function(e) {
                         return ~e.indexOf('anytv');
                     });
