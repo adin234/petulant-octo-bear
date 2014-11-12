@@ -416,7 +416,7 @@ exports.merge_tags = function (videos) {
             videos.forEach(function(item) {
                 (function(item) {
                     console.log('loop at '+(++counter3));
-                    
+
                     var anytv_tags = item.snippet.meta.tags.filter(function(e) {
                         return ~e.indexOf('anytv');
                     });
@@ -535,7 +535,7 @@ exports.translate_job = function(videos) {
 exports.manage_db = function() {
     var data = {},
         start = function() {
-            mongo.dropCollection('videos', function(err, result) {
+            mongo.dropDatabase('asiafreedom_youtubers', function(err, result) {
                 if(err) {
                     return console.log('error in dropping');
                 }
