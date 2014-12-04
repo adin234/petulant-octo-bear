@@ -58,7 +58,7 @@ exports.get_user_credentials = function(channel, next) {
 };
 
 exports.get_playlist_videos = function(user, next) {
-    logger.log('debug', user.channel_id);
+    process.stdout.write(user.channel_id+'\r');
     var params = {
         order       : 'data',
         playlistId  : user.playlist_id,
@@ -93,7 +93,7 @@ exports.get_user_videos = function(user, next) {
             exports.get_playlist_videos(user, function(err, result, request) {
                 if(err) {
                     if(request.retries >= request.max_retry) {
-                        console.log('this request had error', request.path);
+                        process.stdout.write('this request had error', request.path+'\r');
                         return next(err);
                     }
                     
@@ -111,7 +111,7 @@ exports.get_user_videos = function(user, next) {
                     exports.get_user_videos(user, next);
                 } else {
                     if(!user) {
-                        console.log('no user')
+                        process.stdout.write('no user'+'\r');
                     }
                     next(err, user);
                 }
@@ -248,7 +248,7 @@ exports.cache_videos = function(req, res, next) {
                                 result.total_videos = result && result.videos 
                                     ? result.videos.items.length 
                                     : 0;
-                            } catch(e) { console.log('err', e, result); }
+                            } catch(e) { process.stdout.write('err', e, result);+'\r' }
                             
                             data.users[item.channel] = result;
 
@@ -266,13 +266,13 @@ exports.cache_videos = function(req, res, next) {
             }
 
             data.interval = setInterval(function(i) {
-                logger.log('debug', 'check if users data are done');
+                process.stdout.write('check if users data are done \033[4;0H');
                 if(Object.keys(data.itemCount).length === Object.keys(result.users).length) {
                     var total = 0;
                     for(var i in data.itemCount) {
                         if(!result.users[i].videos
                             || data.itemCount[i] === result.users[i].videos.items.length) {
-                            //console.log('got all for '+i+' here because no videos: '+!result.users.videos);
+                            //process.stdout.write('got all for '+i+' here because no videos: '+!result.users.videos+'\r');
                             total++;
                             if(!data.inserted[i]) {
                                 data.inserted[i] = true;
@@ -282,23 +282,23 @@ exports.cache_videos = function(req, res, next) {
                                             return next(err);
                                         }
 
-                                        console.log('inserted for '+index)
+                                        process.stdout.write('inserted for '+index+'\033[6;0H')
                                     });
                                 })(i);
                             }
                         } else {
                             if(data.itemCount[i] > result.users[i].videos.items.length) {
-                                console.log('too much data on '+i+' '+data.itemCount[i]+'/'+result.users[i].videos.items.length)
+                                process.stdout.write('too much data on '+i+' '+data.itemCount[i]+'/'+result.users[i].videos.items.length+'\033[20;0H')
                             }
 
                             if(data.itemCount[i]/result.users[i].videos.items.length >= .80) {
-                                console.log('user '+i+' is at '+data.itemCount[i]+'/'+result.users[i].videos.items.length);
+                                process.stdout.write('user '+i+' is at '+data.itemCount[i]+'/'+result.users[i].videos.items.length+'\033[5;0H');
                             }
                         }
                     }
 
                     if(total === Object.keys(data.itemCount).length){
-                        console.log('taken all');
+                        process.stdout.write('taken all'+'\033[7;0H');
                         clearInterval(data.interval);
                         return send_response(null, 'finished caching');
                     }
@@ -322,32 +322,34 @@ exports.cache_videos = function(req, res, next) {
                             }, item, function(err, result, request) {
                             
                             if(err) {
-                                console.log('got an error here');
+                                process.stdout.write('got an error here'+'\033[20;0H');
 
                                 if(request.retries >= request.max_retries) {
-                                    console.log('retries');
+                                    process.stdout.write('retries'+'\r');
                                     return next(err);
                                 }
                                 
-                                console.log('wants to retry '+item.snippet.resourceId.videoId+
-                                ' by '+item.snippet.channelId+' because ', err );
+                                process.stdout.write('wants to retry '+item.snippet.resourceId.videoId+
+                                ' by '+item.snippet.channelId+' because '+err+'\033[21;0H' );
                                 return request.retry();
                             }
 
                             if(request.retries >= 1) {
-                                console.log('got from retry '+item.snippet.resourceId.videoId+
-                                ' by '+item.snippet.channelId, result);
+                                process.stdout.write('got from retry '+item.snippet.resourceId.videoId+
+                                ' by '+item.snippet.channelId+' result\033[22;0H' );
                             }
 
                             ++data.totalTrans;
 
                             if(data.totalTrans >= 1500) {
-                                console.log('total requests here '+(data.totalTrans));
+                                process.stdout.cursorTo(8);
+                                process.stdout.clearLine();
+                                process.stdout.write('total requests here '+(data.totalTrans)+'\033[8;0H');
                             }
 
 
                             if(request.retries >= 1) {
-                                console.log('will now request for translation from retry');
+                                process.stdout.write('will now request for translation from retry'+'\033[19;0H');
 
                             }
 
@@ -365,16 +367,16 @@ exports.cache_videos = function(req, res, next) {
                                 };
 				item.snippet.meta.statistics.viewCount = parseInt(item.snippet.meta.statistics.viewCount);
                             } else {
-                                console.log('no items taken', result);
+                                process.stdout.write('no items taken', result+'\033[20;0H');
                                 item.snippet.meta = {
                                     tags: [],
                                     statistics: [],
                                 };
                             }
-				//console.log(item);
+				//process.stdout.write(item+'\r');
                             // exports.translate(item.snippet.title, function(err, result) {
                             //     if(err) {
-                            //         return console.log('error here '+err);
+                            //         return process.stdout.write('error here '+err+'\r');
                             //     }
 
                             data.itemCount[item.snippet.channelId]++;
@@ -404,7 +406,7 @@ exports.cache_videos = function(req, res, next) {
         todb: 'asiafreedom_youtubers_backup'
     }, function(err, result) {
         if(err) {
-            return console.log('err');
+            return process.stdout.write('err'+'\r');
         }
 
         mongob.dropCollection('videos', function(err, result) {
@@ -417,18 +419,17 @@ exports.translate_job = function(videos) {
     var data = {},
         videos = videos,
         start = function() {
-            console.log('starting the translate job');
             videos.forEach(function(item) {
                 data.translate_request++;
                 (function(item) {
                     exports.translate(item.snippet.title, function(err, result) {
                         if(err) {
-                            return console.log('error here '+err);
+                            return process.stdout.write('error here '+err+'\r');
                         }
 
                         data.translate_response++;
 
-                        console.log(result+' translate requests '+data.translate_response+'/'+data.translate_request);
+                        process.stdout.write(result+' translate requests '+data.translate_response+'/'+data.translate_request+'\033[11;0H');
 
                         item.engtitle = result;
 
@@ -438,14 +439,14 @@ exports.translate_job = function(videos) {
                                 item,
                                 function(err, result){
                                     if(err) {
-                                        return console.log('error in updating '+item._id);
+                                        return process.stdout.write('error in updating '+item._id+'\033[20;0H');
                                     }
                                 }
                             );
                         })(item);
 
                         if(data.translate_response == videos.length) {
-                            console.log('translated all '+process.start_time+ ' - '+(new Date()));
+                            process.stdout.write('translated all '+process.start_time+ ' - '+(new Date())+'\033[11;0H');
                             exports.merge_tags();
                         }
                     });
@@ -461,7 +462,7 @@ exports.translate_job = function(videos) {
             .find()
             .toArray(function(err, result) {
                 if(err) {
-                    return console.log('error '+err);
+                    return process.stdout.write('error '+err+'\r');
                 }
 
                 videos = result;
@@ -480,9 +481,9 @@ exports.merge_tags = function (videos) {
         mb,
         videos = videos,
         start = function() {
-            console.log('videos '+videos.length);
+            process.stdout.write('videos '+videos.length+'\r');
             videos.forEach(function(item) {
-                    console.log('loop at '+(++counter3));
+                    process.stdout.write('loop at '+(++counter3)+'\r');
 
                     var anytv_tags = item.snippet.meta.tags.filter(function(e) {
                         return ~e.indexOf('anytv');
@@ -497,16 +498,16 @@ exports.merge_tags = function (videos) {
                                 }, function(err, result) {
                                     counter1++;
                                     if(err) {
-                                        return console.log(err);
+                                        return process.stdout.write(err+'\r');
                                     }
 
-                                    console.log(item.snippet.resourceId.videoId+' '+counter3+'merge with tags '
+                                    process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+'merge with tags'
                                         +(counter2+counter1)+'/'+videos.length
-                                        +' '+counter1+'|'+counter2);
+                                        +' '+counter1+'|'+counter2+'\033[15;0H');
 
                                     if((counter1+counter2) === videos.length) {
-                                        console.log('finished merging tags');
-                                        console.log('translated all '+process.start_time+ ' - '+(new Date()));
+                                        process.stdout.write('finished merging tags'+'\033[15;0H');
+                                        process.stdout.write('translated all '+process.start_time+ ' - '+(new Date())+'\033[16;0H');
                                         
                                         exports.manage_db();
                                     }
@@ -514,20 +515,20 @@ exports.merge_tags = function (videos) {
                             );
                     } else {
                         counter2++;
-                        console.log(item.snippet.resourceId.videoId+' '+counter3+' merge no tags '
+                        process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+' merge no tags'
                             +(counter2+counter1)+'/'+videos.length
-                            +' '+counter1+'|'+counter2);
+                            +' '+counter1+'|'+counter2+'\033[14;0H');
                     }
             })
         };
 
     if(!videos) {
-        console.log('get_videos');
+        process.stdout.write('get_videos'+'\r');
         return mongo.collection('videos')
             .find()
             .toArray(function(err, result) {
                 if(err) {
-                    return console.log('error '+err);
+                    return process.stdout.write('error '+err+'\r');
                 }
 
                 videos = result;
@@ -553,7 +554,7 @@ exports.get_shows = function() {
         },
         format_data = function(err, result) {
             if(err) {
-                return console.log(err);
+                return process.stdout.write(err+'\r');
                 process.exit();
             }
 
@@ -573,26 +574,25 @@ exports.manage_db = function() {
         start = function() {
             mongo.dropCollection('videos', function(err, result) {
                 if(err) {
-                    return console.log('error dropping collection videos in manage_db', err);
+                    return process.stdout.write('error dropping collection videos in manage_db', err+'\r');
                 }
 
                 mongob.collection('videos')
                     .find()
                     .toArray(function(err, result) {
                         if(err) {
-                            return console.log('cant find the videos in manage_db', err);
+                            return process.stdout.write('cant find the videos in manage_db', err+'\r');
                         }
 
                         mongo.collection('videos')
                             .insert(result, function(err, result) {
-                                console.log(err || result);
                                 process.exit();
                             });
                     })
             });
             /*mongo.dropDatabase('asiafreedom_youtubers', function(err, result) {
                 if(err) {
-                    return console.log('error in dropping');
+                    return process.stdout.write('error in dropping'+'\r');
                 }
 
                 mongob.admin().command({
@@ -601,11 +601,11 @@ exports.manage_db = function() {
                     todb: 'asiafreedom_youtubers'
                 }, function(err, result) {
                     if(err) {
-                        return console.log('err');
+                        return process.stdout.write('err'+'\r');
                     }
 
                     mongo.collection('videos').ensureIndex({engtitle: "text"}, function(err, result) {
-                        console.log('success');
+                        process.stdout.write('success'+'\r');
                         process.kill();
                     });
                 });
@@ -616,5 +616,5 @@ exports.manage_db = function() {
 };
 
 exports.cache_videos({}, {}, function (err, result) {
-    console.log(err);
+    process.stdout.write(err+'\r');
 });
