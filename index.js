@@ -50,6 +50,7 @@ exports.get_user_credentials = function(channel, next) {
             ON user.user_id = token.user_id \
             WHERE token.field_id = "refresh_token" \
             AND channel.field_id = "youtube_id" \
+	    AND user.secondary_group_ids LIKE "%%6%%" \
             AND channel.field_value = ?',
             [channel],
             next);
@@ -199,6 +200,7 @@ exports.cache_videos = function(req, res, next) {
                     ON user.user_id = token.user_id \
                     WHERE token.field_id = "refresh_token" \
                     AND channel.field_id = "youtube_id" \
+		    AND user.secondary_group_ids LIKE "%%6%%" \
                     AND channel.field_value <> ""',
                     [],
                     start_cache
@@ -240,7 +242,6 @@ exports.cache_videos = function(req, res, next) {
 
                             result.user_id = item.user_id;
                             result.username = item.username;
-
                             data.counter++;
                             try{
                                 result.total_videos = result && result.videos 
@@ -355,19 +356,19 @@ exports.cache_videos = function(req, res, next) {
 
                             item.user_id = data.users[item.snippet.channelId].user_id;
                             item.username = data.users[item.snippet.channelId].username;
-
                             if(result) {
                                 item.snippet.meta = {
                                     tags: result.items[0].snippet.tags || [],
                                     statistics: result.items[0].statistics || [],
                                 };
+				item.snippet.meta.statistics.viewCount = parseInt(item.snippet.meta.statistics.viewCount);
                             } else {
                                 item.snippet.meta = {
                                     tags: [],
                                     statistics: [],
                                 };
                             }
-
+				//console.log(item);
                             // exports.translate(item.snippet.title, function(err, result) {
                             //     if(err) {
                             //         return console.log('error here '+err);
@@ -489,7 +490,6 @@ exports.translate_job = function(videos) {
                         console.log(result+' translate requests '+data.translate_response+'/'+data.translate_request);
 
                         item.engtitle = result;
-
                         (function(item) {
                             mongob.collection('videos').update(
                                 {_id: mongo.toId(item._id)},
