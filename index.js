@@ -496,21 +496,23 @@ exports.merge_tags = function (videos) {
                                 }, {
                                     '$push' : { 'snippet.meta.tags' : { '$each' : anytv_tags } }
                                 }, function(err, result) {
-                                    counter1++;
-                                    if(err) {
-                                        return process.stdout.write(err+'\033[1;0');
-                                    }
+                                    setTimeout(function(result) {
+                                        counter1++;
+                                        if(err) {
+                                            return process.stdout.write(err+'\033[1;0');
+                                        }
 
-                                    process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+' merge with tags'
-                                        +(counter2+counter1)+'/'+videos.length
-                                        +' '+counter1+'|'+counter2+'\033[30;0H');
+                                        process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+' merge with tags'
+                                            +(counter2+counter1)+'/'+videos.length
+                                            +' '+counter1+'|'+counter2+'\033[30;0H');
 
-                                    if((counter1+counter2) === videos.length) {
-                                        process.stdout.write('finished merging tags'+'\033[15;0H');
-                                        process.stdout.write('translated all '+process.start_time+ ' - '+(new Date())+'\033[16;0H');
-                                        
-                                        exports.manage_db();
-                                    }
+                                        if((counter1+counter2) === videos.length) {
+                                            process.stdout.write('finished merging tags'+'\033[15;0H');
+                                            process.stdout.write('translated all '+process.start_time+ ' - '+(new Date())+'\033[16;0H');
+                                            
+                                            exports.manage_db();
+                                        }
+                                    }, (Math.floor(Math.random() * (100 - 1)) + 1), result);
                                 }
                             );
                     } else {
