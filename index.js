@@ -617,6 +617,9 @@ exports.manage_db = function() {
     start();
 };
 
+
+process.setMaxListeners(0);
+
 exports.cache_videos({}, {}, function (err, result) {
     process.stdout.write(err+'\r');
 });
