@@ -357,12 +357,13 @@ exports.cache_videos = function(req, res, next) {
                             item.user_id = data.users[item.snippet.channelId].user_id;
                             item.username = data.users[item.snippet.channelId].username;
 
-                            if(result) {
+                            if(result && result.items[0]) {
                                 item.snippet.meta = {
                                     tags: result.items[0].snippet.tags || [],
                                     statistics: result.items[0].statistics || [],
                                 };
                             } else {
+                                console.log('no items taken', result);
                                 item.snippet.meta = {
                                     tags: [],
                                     statistics: [],
