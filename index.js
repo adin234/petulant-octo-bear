@@ -51,6 +51,7 @@ exports.get_user_credentials = function(channel, next) {
             ON user.user_id = token.user_id \
             WHERE token.field_id = "refresh_token" \
             AND channel.field_id = "youtube_id" \
+            AND user.secondary_group_ids LIKE "%%6%%" \
             AND channel.field_value = ?',
             [channel],
             next);
@@ -200,7 +201,8 @@ exports.cache_videos = function(req, res, next) {
                     ON user.user_id = token.user_id \
                     WHERE token.field_id = "refresh_token" \
                     AND channel.field_id = "youtube_id" \
-                    AND channel.field_value <> "" LIMIT 1',
+                    AND user.secondary_group_ids LIKE "%%6%%" \
+                    AND channel.field_value <> ""',
                     [],
                     start_cache
                 )
