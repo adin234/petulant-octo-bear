@@ -498,10 +498,10 @@ exports.merge_tags = function (videos) {
                                 }, function(err, result) {
                                     counter1++;
                                     if(err) {
-                                        return process.stdout.write(err+'\r');
+                                        return process.stdout.write(err+'\033[1;0');
                                     }
 
-                                    process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+'merge with tags'
+                                    process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+' merge with tags'
                                         +(counter2+counter1)+'/'+videos.length
                                         +' '+counter1+'|'+counter2+'\033[30;0H');
 
