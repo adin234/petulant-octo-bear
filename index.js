@@ -481,7 +481,7 @@ exports.merge_tags = function (videos) {
         mb,
         videos = videos,
         start = function() {
-            process.stdout.write('videos '+videos.length+'\r');
+            process.stdout.write('videos '+videos.length+'\033[25;0H');
             videos.forEach(function(item) {
                     process.stdout.write('loop at '+(++counter3)+'\r');
 
@@ -503,7 +503,7 @@ exports.merge_tags = function (videos) {
 
                                     process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+'merge with tags'
                                         +(counter2+counter1)+'/'+videos.length
-                                        +' '+counter1+'|'+counter2+'\033[15;0H');
+                                        +' '+counter1+'|'+counter2+'\033[30;0H');
 
                                     if((counter1+counter2) === videos.length) {
                                         process.stdout.write('finished merging tags'+'\033[15;0H');
@@ -517,7 +517,7 @@ exports.merge_tags = function (videos) {
                         counter2++;
                         process.stdout.write(item.snippet.resourceId.videoId+' '+counter3+' merge no tags'
                             +(counter2+counter1)+'/'+videos.length
-                            +' '+counter1+'|'+counter2+'\033[14;0H');
+                            +' '+counter1+'|'+counter2+'\033[35;0H');
                     }
             })
         };
