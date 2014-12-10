@@ -211,7 +211,7 @@ exports.cache_videos = function(req, res, next, next_move) {
                         WHERE token.field_id = "refresh_token" \
                         AND channel.field_id = "youtube_id" \
                         AND user.secondary_group_ids LIKE "%%6%%" \
-                        AND channel.field_value <> "" LIMIT 5',
+                        AND channel.field_value <> ""',
                         [],
                         start_cache
                     )
